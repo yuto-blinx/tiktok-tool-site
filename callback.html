@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TikTok_tool - Authenticating...</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; background: #f5f5f5; }
+    .card { background: #fff; border-radius: 8px; padding: 40px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); max-width: 400px; }
+    .spinner { width: 40px; height: 40px; border: 4px solid #eee; border-top: 4px solid #fe2c55; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 16px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .success { color: #22c55e; font-size: 48px; }
+    .error { color: #fe2c55; }
+  </style>
+</head>
+<body>
+  <div class="card" id="card">
+    <div class="spinner" id="spinner"></div>
+    <h2 id="status">Authenticating...</h2>
+    <p id="message" style="color:#666;margin-top:8px">Processing your TikTok login</p>
+  </div>
+
+  <script>
+    (async () => {
+      const params = new URLSearchParams(window.location.search);
+      const code = params.get('code');
+      const state = params.get('state');
+      const error = params.get('error');
+
+      if (error) {
+        document.getElementById('spinner').style.display = 'none';
+        document.getElementById('status').innerHTML = '<span class="error">Login Failed</span>';
+        document.getElementById('message').textContent = params.get('error_description') || error;
+        return;
+      }
+
+      if (!code) {
+        document.getElementById('spinner').style.display = 'none';
+        document.getElementById('status').innerHTML = '<span class="error">No Auth Code</span>';
+        document.getElementById('message').textContent = 'No authorization code received.';
+        return;
+      }
+
+      // Verify CSRF state
+      const savedState = sessionStorage.getItem('csrf_state');
+      if (state !== savedState) {
+        document.getElementById('spinner').style.display = 'none';
+        document.getElementById('status').innerHTML = '<span class="error">Security Error</span>';
+        document.getElementById('message').textContent = 'CSRF state mismatch.';
+        return;
+      }
+
+      // Show success - in a real app, this code would be sent to a backend server
+      // to exchange for an access token. For this demo, we show the auth flow completed.
+      document.getElementById('spinner').style.display = 'none';
+      document.getElementById('status').innerHTML = '<div class="success">✓</div><br>Login Successful';
+      document.getElementById('message').innerHTML = 'Authorization code received.<br>Redirecting to dashboard...';
+
+      // Store demo user data
+      const demoData = {
+        user: {
+          display_name: 'TikTok User',
+          username: 'tiktok_user',
+          avatar_url: 'https://via.placeholder.com/64/fe2c55/fff?text=TT',
+          bio_description: 'Connected via TikTok_tool',
+          follower_count: 0,
+          following_count: 0,
+          likes_count: 0,
+          video_count: 0
+        },
+        auth_code: code
+      };
+      sessionStorage.setItem('user_data', JSON.stringify(demoData));
+
+      setTimeout(() => {
+        window.location.href = './';
+      }, 2000);
+    })();
+  </script>
+</body>
+</html>

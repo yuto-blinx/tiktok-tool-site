@@ -17,7 +17,7 @@
   <div class="card" id="card">
     <div class="spinner" id="spinner"></div>
     <h2 id="status">Authenticating...</h2>
-    <p id="message" style="color:#666;margin-top:8px">Processing your TikTok login</p>
+    <p id="message" style="color:#666;margin-top:8px">Processing your login</p>
   </div>
 
   <script>
@@ -41,40 +41,40 @@
         return;
       }
 
-      // Verify CSRF state
-      const savedState = sessionStorage.getItem('csrf_state');
-      if (state !== savedState) {
-        document.getElementById('spinner').style.display = 'none';
-        document.getElementById('status').innerHTML = '<span class="error">Security Error</span>';
-        document.getElementById('message').textContent = 'CSRF state mismatch.';
-        return;
-      }
-
-      // Show success - in a real app, this code would be sent to a backend server
-      // to exchange for an access token. For this demo, we show the auth flow completed.
-      document.getElementById('spinner').style.display = 'none';
+      // Forward auth code to local server if running, otherwise show success
       document.getElementById('status').innerHTML = '<div class="success">✓</div><br>Login Successful';
-      document.getElementById('message').innerHTML = 'Authorization code received.<br>Redirecting to dashboard...';
+      document.getElementById('spinner').style.display = 'none';
+      document.getElementById('message').innerHTML = 'Authorization code received.<br>Redirecting...';
 
-      // Store demo user data
-      const demoData = {
-        user: {
-          display_name: 'TikTok User',
-          username: 'tiktok_user',
-          avatar_url: 'https://via.placeholder.com/64/fe2c55/fff?text=EP',
-          bio_description: 'Connected via Edit POST',
-          follower_count: 0,
-          following_count: 0,
-          likes_count: 0,
-          video_count: 0
-        },
-        auth_code: code
-      };
-      sessionStorage.setItem('user_data', JSON.stringify(demoData));
+      // Try to redirect to local server with the auth code
+      const localUrl = `http://localhost:3456/callback?code=${encodeURIComponent(code)}&state=${encodeURIComponent(state || '')}`;
 
-      setTimeout(() => {
-        window.location.href = './';
-      }, 2000);
+      // Check if local server is running
+      try {
+        const res = await fetch('http://localhost:3456/', { mode: 'no-cors', signal: AbortSignal.timeout(2000) });
+        window.location.href = localUrl;
+      } catch(e) {
+        // Local server not running - use session storage fallback (for GitHub Pages standalone mode)
+        const savedState = sessionStorage.getItem('csrf_state');
+        if (state && state !== savedState) {
+          document.getElementById('status').innerHTML = '<span class="error">Security Error</span>';
+          document.getElementById('message').textContent = 'CSRF state mismatch.';
+          return;
+        }
+
+        const demoData = {
+          user: {
+            display_name: 'TikTok User',
+            username: 'tiktok_user',
+            avatar_url: 'https://via.placeholder.com/64/fe2c55/fff?text=EP',
+            bio_description: 'Connected via Edit POST',
+            follower_count: 0, following_count: 0, likes_count: 0, video_count: 0
+          },
+          auth_code: code
+        };
+        sessionStorage.setItem('user_data', JSON.stringify(demoData));
+        setTimeout(() => { window.location.href = './'; }, 2000);
+      }
     })();
   </script>
 </body>

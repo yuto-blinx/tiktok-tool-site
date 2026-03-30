@@ -46,35 +46,12 @@
       document.getElementById('spinner').style.display = 'none';
       document.getElementById('message').innerHTML = 'Authorization code received.<br>Redirecting...';
 
-      // Try to redirect to local server with the auth code
+      // Redirect to local server with the auth code
       const localUrl = `http://localhost:3456/callback?code=${encodeURIComponent(code)}&state=${encodeURIComponent(state || '')}`;
 
-      // Check if local server is running
-      try {
-        const res = await fetch('http://localhost:3456/', { mode: 'no-cors', signal: AbortSignal.timeout(2000) });
+      setTimeout(() => {
         window.location.href = localUrl;
-      } catch(e) {
-        // Local server not running - use session storage fallback (for GitHub Pages standalone mode)
-        const savedState = sessionStorage.getItem('csrf_state');
-        if (state && state !== savedState) {
-          document.getElementById('status').innerHTML = '<span class="error">Security Error</span>';
-          document.getElementById('message').textContent = 'CSRF state mismatch.';
-          return;
-        }
-
-        const demoData = {
-          user: {
-            display_name: 'TikTok User',
-            username: 'tiktok_user',
-            avatar_url: 'https://via.placeholder.com/64/fe2c55/fff?text=EP',
-            bio_description: 'Connected via Edit POST',
-            follower_count: 0, following_count: 0, likes_count: 0, video_count: 0
-          },
-          auth_code: code
-        };
-        sessionStorage.setItem('user_data', JSON.stringify(demoData));
-        setTimeout(() => { window.location.href = './'; }, 2000);
-      }
+      }, 1500);
     })();
   </script>
 </body>

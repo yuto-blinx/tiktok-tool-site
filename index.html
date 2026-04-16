@@ -88,24 +88,19 @@
 
       <div class="tools-section">
         <div class="tool-card">
-          <h4>Content Posting</h4>
-          <p>Create and publish video content directly to TikTok from your dashboard.</p>
-          <button onclick="alert('Content Posting API: Upload and publish videos to TikTok')">Post Content</button>
+          <h4>Content Posting (Upload to Inbox)</h4>
+          <p>Upload videos to TikTok as drafts in the creator's inbox via the Content Posting API (video.upload scope).</p>
+          <button onclick="alert('Content Posting API: video.upload scope')">Learn More</button>
         </div>
         <div class="tool-card">
-          <h4>Share Kit</h4>
-          <p>Share content to TikTok or from TikTok to other platforms.</p>
-          <button onclick="alert('Share Kit: Share content across platforms')">Share Content</button>
-        </div>
-        <div class="tool-card">
-          <h4>Data Export</h4>
-          <p>Export your TikTok data using the Data Portability API.</p>
-          <button onclick="alert('Data Portability API: Export your TikTok data')">Export Data</button>
+          <h4>Direct Post</h4>
+          <p>Publish videos directly to a creator's TikTok profile using the Content Posting API (video.publish scope).</p>
+          <button onclick="alert('Content Posting API: video.publish scope')">Learn More</button>
         </div>
         <div class="tool-card">
           <h4>Webhooks</h4>
-          <p>Real-time notifications for comments, video status, and more.</p>
-          <button onclick="alert('Webhooks: Configure real-time event notifications')">Configure</button>
+          <p>Receive real-time TikTok event notifications via our public webhook endpoint.</p>
+          <button onclick="alert('Webhooks Product: real-time event notifications')">Learn More</button>
         </div>
       </div>
 
@@ -123,7 +118,7 @@
   <script>
     const CLIENT_KEY = 'sbawmqdem9ykfz06hq';
     const REDIRECT_URI = 'https://yuto-blinx.github.io/edit-post-site/callback.html';
-    const SCOPES = 'user.info.basic,user.info.profile,user.info.stats,video.list';
+    const SCOPES = 'user.info.basic,user.info.profile,user.info.stats,video.list,video.upload,video.publish';
 
     // Generate PKCE code verifier and challenge
     function generateCodeVerifier() {
